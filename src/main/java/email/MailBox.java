@@ -1,5 +1,8 @@
 package email;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -161,8 +164,9 @@ public class MailBox {
      * the same timestamp, the ordering among those messages is arbitrary.
      */
     public List<Email> getTimestampView() {
-        // TODO: Implement this method
-        return null;
+        List<Email> emailList = new ArrayList<>(mailBox.values());
+        emailList.sort(Comparator.comparing(Email::getTimestamp).reversed());
+        return emailList;
     }
 
     /**
@@ -177,10 +181,14 @@ public class MailBox {
      * sorted with the earliest message first and breaking ties arbitrarily
      */
     public List<Email> getMsgsInRange(int startTime, int endTime) {
-        // TODO: Implement this method
-        return null;
+        if(startTime < 0 || endTime < startTime){
+            return Collections.emptyList();
+        }
+        return mailBox.values().stream()
+            .filter(email -> email.getTimestamp() >= startTime && email.getTimestamp() <= endTime)
+            .sorted(Comparator.comparing(Email::getTimestamp))
+            .toList();
     }
-
 
     /**
      * Mark all the messages in the same thread as the message
