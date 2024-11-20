@@ -1,5 +1,7 @@
 package email;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -7,7 +9,16 @@ import java.util.UUID;
  * A datatype that represents a mailbox or collection of email.
  */
 public class MailBox {
-    // TODO Implement this datatype
+
+    private final HashMap<UUID, Email> mailBox;
+    private final HashSet<UUID> unreadMail;
+    private final HashSet<UUID> readMail;
+
+    public MailBox() {
+        this.mailBox = new HashMap<>();
+        this.unreadMail = new HashSet<>();
+        this.readMail = new HashSet<>();
+    }
 
     /**
      * Add a new message to the mailbox
@@ -18,7 +29,14 @@ public class MailBox {
      * or msg was null)
      */
     public boolean addMsg(Email msg) {
-        // TODO: Implement this method
+        if(msg == null){
+            return false;
+        }
+        if(!(mailBox.containsValue(msg))){
+            mailBox.put(msg.getId(), msg);
+            unreadMail.add(msg.getId());
+            return true;
+        }
         return false;
     }
 
@@ -30,8 +48,13 @@ public class MailBox {
      * and null if such an email does not exist in this mailbox
      */
     public Email getMsg(UUID msgID) {
-        // TODO: Implement this method
-        throw new UnsupportedOperationException(); // You should change this!
+        if(msgID == null){
+            return null;
+        }
+        if(mailBox.containsKey(msgID)){
+            return mailBox.get(msgID);
+        }
+        return null;
     }
 
     /**
@@ -42,7 +65,14 @@ public class MailBox {
      * else return false
      */
     public boolean delMsg(UUID msgId) {
-        // TODO: Implement this method
+        if(msgId == null){
+            return false;
+        }
+        if(mailBox.containsKey(msgId)){
+            mailBox.remove(msgId);
+            unreadMail.remove(msgId);
+            return true;
+        }
         return false;
     }
 
@@ -52,8 +82,7 @@ public class MailBox {
      * @return the number of messages in the mailbox
      */
     public int getMsgCount() {
-        // TODO: Implement this method
-        return -1;
+        return mailBox.size();
     }
 
     /**
@@ -63,7 +92,14 @@ public class MailBox {
      * @return true if the message exists in the mailbox and false otherwise
      */
     public boolean markRead(UUID msgID) {
-        // TODO: Implement this method
+        if(msgID == null){
+            return false;
+        }
+        if(mailBox.containsKey(msgID)){
+            readMail.add(msgID);
+            unreadMail.remove(msgID);
+            return true;
+        }
         return false;
     }
 
@@ -74,7 +110,17 @@ public class MailBox {
      * @return true if the message exists in the mailbox and false otherwise
      */
     public boolean markUnread(UUID msgID) {
-        // TODO: Implement this method
+        if(msgID == null){
+            return false;
+        }
+        if(mailBox.containsKey(msgID)){
+            unreadMail.add(msgID);
+            if(readMail.contains(msgID)){
+                readMail.remove(msgID);
+                return true;
+            }
+            return true;
+        }
         return false;
     }
 
@@ -86,7 +132,15 @@ public class MailBox {
      * @throws IllegalArgumentException if the message does not exist in the mailbox
      */
     public boolean isRead(UUID msgID) {
-        // TODO: Implement this method
+        if(msgID == null){
+            return false;
+        }
+        if(!mailBox.containsKey(msgID)){
+            throw new IllegalArgumentException("Message not in mailbox");
+        }
+        if(mailBox.containsKey(msgID) && readMail.contains(msgID)){
+            return true;
+        }
         return false;
     }
 
@@ -95,8 +149,7 @@ public class MailBox {
      * @return the number of unread messages in this mailbox
      */
     public int getUnreadMsgCount() {
-        // TODO: Implement this method
-        return -1;
+        return unreadMail.size();
     }
 
     /**
